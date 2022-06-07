@@ -10,7 +10,7 @@ class MoviesController < ApplicationController
     # @movies = Movie.all
     @all_ratings = Movie.all_ratings
     @ratings_to_show_hash = params[:ratings] || select_all_hash
-    @ratings_list = ratings_list
+    @ratings_list = @ratings_to_show_hash.keys
     @movies = Movie.with_ratings(@ratings_list)
   end
 
@@ -49,11 +49,11 @@ class MoviesController < ApplicationController
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
 
-  def selected_ratings
-    @selected_ratings_hash&.keys
-  end
-
   def select_all_hash
-    @all_ratings.each_with_object({}) { |rating, hash| hash[rating] = '1' }
+    hash = {}
+    @all_ratings.each do |rating|
+      hash[rating] = 1
+    end
+    hash
   end
 end
