@@ -3,7 +3,13 @@ class Movie < ActiveRecord::Base
     #Return ['G','PG','PG-13','R']
     %w(G PG PG-13 R)
   end
-  def self.filter_by_ratings(ratings)
-    Movie.where(rating: ratings)
+  def self.with_ratings(ratings_list)
+    if ratings_list.nil?
+      return []
+    elsif ratings_list.empty?
+      return Movie.all
+    else
+      return Movie.where(:rating => ratings_list)
+    end
   end
 end
