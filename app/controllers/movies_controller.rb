@@ -48,4 +48,11 @@ class MoviesController < ApplicationController
   def movie_params
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
+
+  def selected_ratings
+    @selected_ratings_hash&.keys
+  end
+
+  def select_all_hash
+    hash[@all_ratings.map{|rating|, [rating, "1"]}]
 end
