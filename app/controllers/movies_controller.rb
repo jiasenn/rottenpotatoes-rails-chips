@@ -54,6 +54,6 @@ class MoviesController < ApplicationController
   end
 
   def select_all_hash
-    hash[@all_ratings.map{|rating|, [rating, "1"]}]
+    @all_ratings.each_with_object({}) { |rating, hash| hash[rating] = '1' }
   end
 end
