@@ -11,7 +11,10 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.all_ratings
     @ratings_to_show_hash = params[:ratings] || select_all_hash
     @ratings_list = @ratings_to_show_hash.keys
-    @movies = Movie.with_ratings(@ratings_list)
+    @sorting_by = params[:sort_by] || "id"
+    determine_highlighting
+    @movies = Movie.filter_and_sort(@ratings_list, @sorting_by)
+    # @sort_title = sort_title
   end
 
   def new
@@ -50,10 +53,13 @@ class MoviesController < ApplicationController
   end
 
   def select_all_hash
-    hash = {}
-    @all_ratings.each do |rating|
-      hash[rating] = 1
-    end
-    hash
+    Hash[Movie.all_ratings.map {|rating| [rating, "1"]}]
   end
+
+  def determine_highlighting
+  @highlight = {:title=>"", :release_date=>"", :id=>""}
+    # "bg-warning hilite"
+    @highlight[@sorting_by] = "bg-warning hilite"
+  end
+
 end

@@ -10,4 +10,11 @@ class Movie < ActiveRecord::Base
       return Movie.where(:rating => ratings_list)
     end
   end
+  def self.filter_and_sort(a,b)
+    if a.nil?
+      return Movie.all.order(b)
+    else
+      return Movie.where(:rating => a).order(b)
+    end
+  end
 end
