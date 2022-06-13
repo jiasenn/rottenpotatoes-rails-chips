@@ -6,22 +6,45 @@ class MoviesController < ApplicationController
     # will render app/views/movies/show.<extension> by default
   end
 
+  # def index
+  #   # @movies = Movie.all
+  #   sort = params[:sort_by] || session[:sort_by]
+  #   @all_ratings = Movie.all_ratings
+  #   @ratings_to_show_hash = params[:ratings] || session[:ratings] || select_all_hash
+  #   @ratings_list = @ratings_to_show_hash.keys
+  #   @highlight = {:title=>"", :release_date=>"", :id=>""}
+  #   # "bg-warning hilite"
+  #   @highlight[sort] = "bg-warning hilite"
+  #   if params[:sort_by] != session[:sort_by] or params[:ratings] != session[:ratings]
+  #     session[:sort_by] = sort
+  #     session[:ratings] = @ratings_to_show_hash
+  #     redirect_to :sort_by => sort, :ratings => @ratings_to_show_hash and return
+  #   end
+  #   @movies = Movie.filter_and_sort(@ratings_list, sort)
+  #   # @sort_title = sort_title
+  # end
+
   def index
-    # @movies = Movie.all
-    sort = params[:sort_by] || session[:sort_by]
-    @all_ratings = Movie.all_ratings
-    @ratings_to_show_hash = params[:ratings] || session[:ratings] || select_all_hash
-    @ratings_list = @ratings_to_show_hash.keys
-    @highlight = {:title=>"", :release_date=>"", :id=>""}
-    # "bg-warning hilite"
-    @highlight[sort] = "bg-warning hilite"
-    if params[:sort_by] != session[:sort_by] or params[:ratings] != session[:ratings]
-      session[:sort_by] = sort
-      session[:ratings] = @ratings_to_show_hash
-      redirect_to :sort_by => sort, :ratings => @ratings_to_show_hash and return
+    sort = params[:sort] || session[:sort]
+    case sort
+    when 'title'
+      ordering,@title_header = {:title => :asc}, 'bg-warning hilite'
+    when 'release_date'
+      ordering,@date_header = {:release_date => :asc}, 'bg-warning hilite'
     end
-    @movies = Movie.filter_and_sort(@ratings_list, sort)
-    # @sort_title = sort_title
+    @all_ratings = Movie.all_ratings
+    @selected_ratings = params[:ratings] || session[:ratings] || {}
+
+    if @selected_ratings == {}
+      @selected_ratings = Hash[@all_ratings.map {|rating| [rating, rating]}]
+    end
+
+    if params[:sort] != session[:sort] or params[:ratings] != session[:ratings]
+      session[:sort] = sort
+      session[:ratings] = @selected_ratings
+      redirect_to :sort => sort, :ratings => @selected_ratings and return
+    end
+    @movies = Movie.where(rating: @selected_ratings.keys).order(ordering)
   end
 
   def new
@@ -59,8 +82,8 @@ class MoviesController < ApplicationController
     params.require(:movie).permit(:title, :rating, :description, :release_date)
   end
 
-  def select_all_hash
-    Hash[Movie.all_ratings.map {|rating| [rating, rating]}]
-  end
+  # def select_all_hash
+  #   Hash[Movie.all_ratings.map {|rating| [rating, rating]}]
+  # end
 
 end
